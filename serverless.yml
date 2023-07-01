@@ -1,0 +1,37 @@
+service: nest-prisma
+
+# plugins:
+#   - serverless-offline
+
+package:
+  individually: true
+  # TODO: Need to review what are the files that I need to include. I believe just the schema and not the engine, but not sure.
+  patterns:
+    - 'node_modules/.prisma/client/libquery_engine-rhel-openssl-1.0.x.so.node'
+    - 'node_modules/.prisma/**/libquery_engine-rhel-openssl-1.0.x.so.node'
+    - 'node_modules/.prisma/client/schema.prisma'
+    - 'node_modules/prisma/*'
+    - 'node_modules/@prisma/engines/**/*' 
+    - 'node_modules/prisma/build/*'
+    - 'node_modules/.prisma/build/*'
+    - 'dist'
+#     # - 'prisma/*.db'
+#     - '!*'
+    - '!node_modules'
+#     - '!src'
+#     - '!test'
+
+provider:
+  name: aws
+  profile: '[YOUR_PROFILE]'
+  runtime: nodejs18.x
+
+functions:
+  main:
+    environment:
+      DATABASE_URL: postgresql://[USER]:[PASSWORD]@[HOST]:[PORT]/[DB_NAME]?schema=[SCHEMA | public]
+    handler: dist/main.handler 
+    events:
+      - httpApi:
+          method: ANY
+          path: /gql/users
